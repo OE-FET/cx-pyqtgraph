@@ -402,6 +402,25 @@ class AxisItem(GraphicsWidget):
         self.labelStyle['color'] = '#' + fn.colorStr(self._pen.color())[:6]
         self.setLabel()
         self.update()
+        
+    def textPen(self):
+        if self._textPen is None:
+            return fn.mkPen(getConfigOption('foreground'))
+        return fn.mkPen(self._textPen)
+
+    def setTextPen(self, *args, **kwargs):
+        """
+        Set the pen used for drawing text.
+        If no arguments are given, the default foreground color will be used.
+        """
+        self.picture = None
+        if args or kwargs:
+            self._textPen = fn.mkPen(*args, **kwargs)
+        else:
+            self._textPen = fn.mkPen(getConfigOption('foreground'))
+        self.labelStyle['color'] = '#' + fn.colorStr(self._textPen.color())[:6]
+        self.setLabel()
+        self.update()
 
     def setScale(self, scale=None):
         """
@@ -1046,13 +1065,13 @@ class AxisItem(GraphicsWidget):
             p.drawLine(p1, p2)
         profiler('draw ticks')
 
-        ## Draw all text
+        # Draw all text
         if self.tickFont is not None:
             p.setFont(self.tickFont)
-        p.setPen(self.pen())
+        p.setPen(self.textPen())
         for rect, flags, text in textSpecs:
             p.drawText(rect, flags, text)
-            #p.drawRect(rect)
+
         profiler('draw text')
 
     def show(self):

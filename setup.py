@@ -3,7 +3,7 @@ DESCRIPTION = """\
 Temporary fork of PyQtGraph for CustomXepr.
 
 PyQtGraph is a pure-python graphics and GUI library built on PyQt4/PySide and
-numpy. 
+numpy.
 
 It is intended for use in mathematics / scientific / engineering applications.
 Despite being written entirely in python, the library is very fast due to its
@@ -129,7 +129,7 @@ class Install(install.install):
 
 
 setup(
-    version=version,
+    version='v0.12',
     cmdclass={'build': Build,
               'install': Install,
               'deb': helpers.DebCommand,

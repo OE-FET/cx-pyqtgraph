@@ -129,7 +129,7 @@ class Install(install.install):
 
 
 setup(
-    version='v0.12',
+    version='v0.12.1',
     cmdclass={'build': Build,
               'install': Install,
               'deb': helpers.DebCommand,

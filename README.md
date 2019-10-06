@@ -2,10 +2,11 @@
 [![Build Status](https://pyqtgraph.visualstudio.com/pyqtgraph/_apis/build/status/pyqtgraph.pyqtgraph?branchName=develop)](https://pyqtgraph.visualstudio.com/pyqtgraph/_build/latest?definitionId=17&branchName=develop)
 
 
-This is a fork of PyQtGraph with several bug fixes. This version is required for the package [mercurygui](https://github.com/OE-FET/mercurygui) and highly recommended for [keithleygui](https://github.com/OE-FET/keithleygui). Install by running:
+This is a fork of PyQtGraph, required by keithleygui and mercurygui. In installs into the `cx_pyqtgraph` namespace.
+Install by running:
 
 ```shell
-$ pip install git+https://github.com/OE-FET/pyqtgraph
+$ pip install cx_pyqtgraph
 ```
 
 

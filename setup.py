@@ -13,7 +13,7 @@ heavy leverage of numpy for number crunching, Qt's GraphicsView framework for
 """
 
 setupOpts = dict(
-    name='cx-pyqtgraph',
+    name='cx_pyqtgraph',
     description='dRonin fork of scientific Graphics and GUI Library for Python',
     long_description=DESCRIPTION,
     license='MIT',

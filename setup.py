@@ -1,10 +1,7 @@
+# -*- coding: utf-8 -*-
 DESCRIPTION = """\
-This is CustomXepr's fork of PyQtGraph.
-
-This package installs into the cx_pyqtgraph namespace to avoid conflicts.
-
-PyQtGraph is a pure-python graphics and GUI library built on PyQt4/PySide and
-numpy.
+PyQtGraph is a pure-python graphics and GUI library built on PyQt4/PyQt5/PySide/PySide2 and
+numpy. 
 
 It is intended for use in mathematics / scientific / engineering applications.
 Despite being written entirely in python, the library is very fast due to its
@@ -13,17 +10,16 @@ heavy leverage of numpy for number crunching, Qt's GraphicsView framework for
 """
 
 setupOpts = dict(
-    name='cx_pyqtgraph',
-    description='dRonin fork of scientific Graphics and GUI Library for Python',
+    name='pyqtgraph',
+    description='Scientific Graphics and GUI Library for Python',
     long_description=DESCRIPTION,
-    license='MIT',
+    license =  'MIT',
     url='http://www.pyqtgraph.org',
-    author='dRonin',
-    author_email='info@dronin.org',
+    author='Luke Campagnola',
+    author_email='luke.campagnola@gmail.com',
     classifiers = [
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
@@ -46,87 +42,106 @@ try:
     from setuptools import setup
     from setuptools.command import install
 except ImportError:
+    sys.stderr.write("Warning: could not import setuptools; falling back to distutils.\n")
     from distutils.core import setup
     from distutils.command import install
+
+
+# Work around mbcs bug in distutils.
+# http://bugs.python.org/issue10945
+import codecs
+try:
+    codecs.lookup('mbcs')
+except LookupError:
+    ascii = codecs.lookup('ascii')
+    func = lambda name, enc=ascii: {True: enc}.get(name=='mbcs')
+    codecs.register(func)
+
 
 path = os.path.split(__file__)[0]
 sys.path.insert(0, os.path.join(path, 'tools'))
 import setupHelpers as helpers
 
 ## generate list of all sub-packages
-allPackages = helpers.listAllPackages(pkgroot='cx_pyqtgraph')
+allPackages = (helpers.listAllPackages(pkgroot='pyqtgraph') + 
+               ['pyqtgraph.'+x for x in helpers.listAllPackages(pkgroot='examples')])
 
 ## Decide what version string to use in the build
-version, forcedVersion, gitVersion, initVersion = helpers.getVersionStrings(pkg='cx_pyqtgraph')
+version, forcedVersion, gitVersion, initVersion = helpers.getVersionStrings(pkg='pyqtgraph')
+
 
 
 class Build(build.build):
     """
     * Clear build path before building
-    * Set version string in __init__ after building
     """
     def run(self):
-        global path, version, initVersion, forcedVersion
-        global buildVersion
+        global path
 
         ## Make sure build directory is clean
         buildPath = os.path.join(path, self.build_lib)
         if os.path.isdir(buildPath):
             distutils.dir_util.remove_tree(buildPath)
-
+    
         ret = build.build.run(self)
-
-        # If the version in __init__ is different from the automatically-generated
-        # version string, then we will update __init__ in the build directory
-        if initVersion == version:
-            return ret
-
-        try:
-            initfile = os.path.join(buildPath, 'cx_pyqtgraph', '__init__.py')
-            data = open(initfile, 'r').read()
-            open(initfile, 'w').write(re.sub(r"__version__ = .*", "__version__ = '%s'" % version, data))
-            buildVersion = version
-        except:
-            if forcedVersion:
-                raise
-            buildVersion = initVersion
-            sys.stderr.write("Warning: Error occurred while setting version string in build path. "
-                             "Installation will use the original version string "
-                             "%s instead.\n" % (initVersion)
-                             )
-            sys.excepthook(*sys.exc_info())
-        return ret
-
+        
 
 class Install(install.install):
     """
     * Check for previously-installed version before installing
+    * Set version string in __init__ after building. This helps to ensure that we
+      know when an installation came from a non-release code base.
     """
     def run(self):
+        global path, version, initVersion, forcedVersion, installVersion
+        
         name = self.config_vars['dist_name']
-        path = self.install_libbase
-        if os.path.exists(path) and name in os.listdir(path):
+        path = os.path.join(self.install_libbase, 'pyqtgraph')
+        if os.path.exists(path):
             raise Exception("It appears another version of %s is already "
-                            "installed at %s; remove this before installing."
+                            "installed at %s; remove this before installing." 
                             % (name, path))
         print("Installing to %s" % path)
-        return install.install.run(self)
+        rval = install.install.run(self)
+
+        
+        # If the version in __init__ is different from the automatically-generated
+        # version string, then we will update __init__ in the install directory
+        if initVersion == version:
+            return rval
+        
+        try:
+            initfile = os.path.join(path, '__init__.py')
+            data = open(initfile, 'r').read()
+            open(initfile, 'w').write(re.sub(r"__version__ = .*", "__version__ = '%s'" % version, data))
+            installVersion = version
+        except:
+            sys.stderr.write("Warning: Error occurred while setting version string in build path. "
+                             "Installation will use the original version string "
+                             "%s instead.\n" % (initVersion)
+                             )
+            if forcedVersion:
+                raise
+            installVersion = initVersion
+            sys.excepthook(*sys.exc_info())
+    
+        return rval
 
 
 setup(
     version=version,
-    cmdclass={'build': Build,
+    cmdclass={'build': Build, 
               'install': Install,
-              'deb': helpers.DebCommand,
+              'deb': helpers.DebCommand, 
               'test': helpers.TestCommand,
               'debug': helpers.DebugCommand,
               'mergetest': helpers.MergeTestCommand,
               'style': helpers.StyleCommand},
     packages=allPackages,
+    package_dir={'pyqtgraph.examples': 'examples'},  ## install examples along with the rest of the source
+    package_data={'pyqtgraph.examples': ['optics/*.gz', 'relativity/presets/*.cfg']},
     install_requires = [
-        #'PyQt5',
-        'numpy'
+        'numpy>=1.8.0',
         ],
     **setupOpts
 )
-

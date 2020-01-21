@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .GraphicsWidget import GraphicsWidget
 from .LabelItem import LabelItem
 from ..Qt import QtGui, QtCore
@@ -93,7 +94,7 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         pen = fn.mkPen(*args, **kargs)
         self.opts['pen'] = pen
 
-        self.update()
+        self.paint()
 
     def brush(self):
         return self.opts['brush']
@@ -104,7 +105,7 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
             return
         self.opts['brush'] = brush
 
-        self.update()
+        self.paint()
 
     def labelTextColor(self):
         return self.opts['labelTextColor']
@@ -119,11 +120,11 @@ class LegendItem(GraphicsWidget, GraphicsWidgetAnchor):
         for sample, label in self.items:
             label.setAttr('color', self.opts['labelTextColor'])
 
-        self.update()
+        self.paint()
 
     def setParentItem(self, p):
         ret = GraphicsWidget.setParentItem(self, p)
-        if self.offset() is not None:
+        if self.opts['offset'] is not None:
             offset = Point(self.opts['offset'])
             anchorx = 1 if offset[0] <= 0 else 0
             anchory = 1 if offset[1] <= 0 else 0
@@ -251,7 +252,3 @@ class ItemSample(GraphicsWidget):
 
             p.translate(10, 10)
             path = drawSymbol(p, symbol, size, pen, brush)
-
-
-
-

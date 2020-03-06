@@ -1,6 +1,8 @@
 
 [![Build Status](https://pyqtgraph.visualstudio.com/pyqtgraph/_apis/build/status/pyqtgraph.pyqtgraph?branchName=develop)](https://pyqtgraph.visualstudio.com/pyqtgraph/_build/latest?definitionId=17&branchName=develop)
 
+**Delevopment on pyqtgraph is active again and a release candidate for v0.11.0 has been released. It is recommended to use upstream.**
+
 
 This is a fork of PyQtGraph, required by keithleygui and mercurygui. In installs into the `cx_pyqtgraph` namespace.
 Install by running:
